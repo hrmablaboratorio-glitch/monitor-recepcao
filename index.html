@@ -24,7 +24,7 @@
 
         body { display: flex; flex-direction: column; overflow-x: hidden; }
 
-        /* HEADER */
+        /* HEADER - Ajustado para ser responsivo */
         header {
             background: var(--sesap-blue);
             min-height: 12vh;
@@ -47,12 +47,7 @@
             line-height: 1.1;
         }
 
-        .header-right {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-        }
-
+        .header-right { text-align: right; display: flex; flex-direction: column; }
         #data-atual { font-size: 1.4vw; font-weight: bold; text-transform: uppercase; }
         #relogio { font-size: 4.5vw; font-weight: bold; font-family: monospace; line-height: 1; }
 
@@ -67,7 +62,7 @@
 
         .categoria-linha {
             display: flex;
-            flex-direction: row; /* Padrão Desktop/TV */
+            flex-direction: row; 
             background: #111;
             border: 1px solid var(--border);
             min-height: 12vh;
@@ -98,7 +93,7 @@
 
         .plantonista-box {
             flex: 1;
-            min-width: 200px;
+            min-width: 200px; /* Garante que na TV eles fiquem lado a lado */
             background: #151515;
             display: flex;
             flex-direction: column;
@@ -114,7 +109,7 @@
             color: #000 !important;
         }
 
-        .nome { font-size: 1.8vw; font-weight: 900; text-transform: uppercase; }
+        .nome { font-size: 1.8vw; font-weight: 900; text-transform: uppercase; word-wrap: break-word; }
         .info-sub { font-size: 1.1vw; font-weight: bold; margin-top: 5px; }
 
         /* FOOTER */
@@ -142,19 +137,19 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* RESPONSIVIDADE PARA CELULAR (TELAS PEQUENAS) */
+        /* MEDIA QUERY: AJUSTES ESPECÍFICOS PARA CELULAR */
         @media (max-width: 768px) {
             header { flex-direction: column; height: auto; padding: 15px; text-align: center; }
-            header h1 { font-size: 5vw; margin-bottom: 10px; }
+            header h1 { font-size: 5.5vw; margin-bottom: 10px; }
             .header-right { text-align: center; align-items: center; }
             #data-atual { font-size: 4vw; }
-            #relogio { font-size: 12vw; }
+            #relogio { font-size: 14vw; }
 
-            .categoria-linha { flex-direction: column; height: auto; margin-bottom: 15px; }
+            .categoria-linha { flex-direction: column; height: auto; margin-bottom: 10px; border: 2px solid #555; }
             .cargo-titulo { 
                 width: 100%; 
                 font-size: 5vw; 
-                padding: 15px 0; 
+                padding: 12px 0; 
                 border-right: none; 
                 border-bottom: 3px solid #fff;
             }
@@ -162,15 +157,17 @@
             .profissionais-container { flex-direction: column; }
             .plantonista-box { 
                 width: 100%; 
+                min-width: unset;
                 border-right: none; 
                 border-bottom: 1px solid var(--border);
                 padding: 20px 10px;
             }
-            .nome { font-size: 6vw; }
-            .info-sub { font-size: 4vw; }
+            /* Aumenta a fonte no celular para facilitar leitura */
+            .nome { font-size: 6vw !important; } 
+            .info-sub { font-size: 4.5vw !important; }
             
-            main { overflow-y: auto; }
-            html, body { overflow-y: auto; height: auto; } /* Permite scroll no celular */
+            main { overflow-y: visible; }
+            html, body { overflow-y: auto; height: auto; }
         }
     </style>
 </head>
@@ -233,10 +230,14 @@
                 linhaDiv.className = 'categoria-linha';
                 categorias[chave].sort((a, b) => b.ativo - a.ativo);
                 
+                // Lógica de fonte para a TV: Se tiver muitos (Técnicos), diminui um pouco
+                let total = categorias[chave].length;
+                let fontTV = total > 3 ? '1.5vw' : '1.8vw';
+
                 let html = `<div class="cargo-titulo">${chave}</div><div class="profissionais-container">`;
                 categorias[chave].forEach(p => {
                     html += `<div class="plantonista-box ${p.ativo ? 'ativo' : ''}">
-                        <div class="nome">${p.nome}</div>
+                        <div class="nome" style="font-size: ${fontTV}">${p.nome}</div>
                         <div class="info-sub">${p.inicio} - ${p.fim}</div>
                     </div>`;
                 });
