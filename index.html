@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Escala - Hospital Monsenhor Antonio Barros</title>
+    <style>
+        :root {
+            --sesap-blue: #004a8d;
+            --highlight: #ffff00; /* Amarelo vibrante para destaque */
+            --bg-dark: #1a1a1a;
+            --card-bg: #262626;
+            --text-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: var(--sesap-blue);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid #fff;
+        }
+
+        .logo-area h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
+        .logo-area p { margin: 5px 0 0; font-size: 18px; font-weight: bold; }
+
+        #clock-container { text-align: right; }
+        #clock { font-size: 40px; font-weight: bold; font-family: monospace; }
+        #date { font-size: 18px; }
+
+        /* Grade do Painel */
+        #dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .category-group {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #444;
+        }
+
+        .category-group h2 {
+            margin-top: 0;
+            color: #4db8ff;
+            border-bottom: 2px solid #4db8ff;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .row-plantonista {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            background: #333;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-radius: 5px;
+            transition: all 0.4s ease;
+        }
+
+        /* Lógica de Destaque */
+        .active-now {
+            background-color: var(--highlight) !important;
+            color: #000 !important;
+            font-weight: bold;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+        }
+
+        .info-main { font-size: 18px; }
+        .info-sub { font-size: 14px; opacity: 0.8; }
+        .info-time { text-align: right; font-weight: bold; }
+
+        /* Rodapé de Notícias */
+        footer {
+            background: #000;
+            color: #00ff00;
+            padding: 10px 0;
+            font-size: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-top: 2px solid #333;
+        }
+
+        .news-ticker {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-100%, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <h1>Hosp. Regional Monsenhor Antonio Barros</h1>
+        <p>SESAP - Governo do Rio Grande do Norte</p>
+    </div>
+    <div id="clock-container">
+        <div id="clock">00:00:00</div>
+        <div id="date">--/--/----</div>
+    </div>
+</header>
+
+<main id="dashboard">
+    <div style="grid-column: 1/-1; text-align: center; margin-top: 50px;">
+        <h2>Carregando escala do Google Sheets...</h2>
+    </div>
+</main>
+
+<footer>
+    <div class="news-ticker" id="ticker-text">
+        +++ BEM-VINDO AO PORTAL DE ESCALAS DO HOSPITAL REGIONAL MONSENHOR ANTONIO BARROS +++ MANTENHA A ESCALA ATUALIZADA VIA DISPOSITIVO MÓVEL +++ SESAP RN +++
+    </div>
+</footer>
+
+<script>
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
+
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('pt-BR');
+        document.getElementById('date').innerText = now.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    async function fetchData() {
+        try {
+            const response = await fetch(SHEET_URL);
+            const tsvData = await response.text();
+            const rows = tsvData.split('\n').map(row => row.split('\t'));
+            renderDashboard(rows.slice(1)); // Remove o cabeçalho
+        } catch (err) {
+            console.error("Erro ao ler planilha:", err);
+        }
+    }
+
+    function isAtivo(inicio, fim) {
+        const agora = new Date();
+        const [hI, mI] = inicio.split(':').map(Number);
+        const [hF, mF] = fim.split(':').map(Number);
+        
+        const totalAgora = agora.getHours() * 60 + agora.getMinutes();
+        const totalInicio = hI * 60 + mI;
+        let totalFim = hF * 60 + mF;
+
+        if (totalFim < totalInicio) totalFim += 1440; // Trata virada de noite
+        return totalAgora >= totalInicio && totalAgora < totalFim;
+    }
+
+    function renderDashboard(data) {
+        const container = document.getElementById('dashboard');
+        container.innerHTML = '';
+
+        const categorias = {};
+        
+        data.forEach(item => {
+            if (item.length < 5) return;
+            const [nome, cargo, especialidade, turno, inicio, fim] = item;
+            if (!categorias[cargo]) categorias[cargo] = [];
+            categorias[cargo].push({nome, especialidade, turno, inicio, fim});
+        });
+
+        for (const [cargo, pessoas] of Object.entries(categorias)) {
+            const group = document.createElement('div');
+            group.className = 'category-group';
+            group.innerHTML = `<h2>${cargo}</h2>`;
+
+            pessoas.forEach(p => {
+                const ativo = isAtivo(p.inicio, p.fim);
+                const card = document.createElement('div');
+                card.className = `row-plantonista ${ativo ? 'active-now' : ''}`;
+                card.innerHTML = `
+                    <div class="info-main">
+                        <div class="nome">${p.nome.trim()}</div>
+                        <div class="info-sub">${p.especialidade} | ${p.turno}</div>
+                    </div>
+                    <div class="info-time">
+                        ${p.inicio.trim()} - ${p.fim.trim()}
+                    </div>
+                `;
+                group.appendChild(card);
+            });
+            container.appendChild(group);
+        }
+    }
+
+    setInterval(updateTime, 1000);
+    setInterval(fetchData, 30000); // Atualiza dados a cada 30 seg
+    fetchData();
+    updateTime();
+</script>
+</body>
+</html>
