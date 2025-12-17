@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAINEL DE ESCALA - MONSENHOR ANTONIO BARROS</title>
+    <title>PAINEL DE ESCALA - MONS. ANTONIO BARROS</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
@@ -16,7 +16,7 @@
         * { box-sizing: border-box; }
         
         body {
-            font-family: 'Arial Black', Gadget, sans-serif;
+            font-family: 'Arial Black', sans-serif;
             background-color: var(--bg);
             color: #fff;
             margin: 0;
@@ -32,86 +32,92 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
-            border-bottom: 5px solid #fff;
+            padding: 0 40px;
+            border-bottom: 6px solid #fff;
+            flex-shrink: 0;
         }
 
-        .h-txt h1 { margin: 0; font-size: 2.2vw; }
-        .h-txt p { margin: 0; font-size: 1.4vw; color: #ffeb3b; }
+        .h-txt h1 { margin: 0; font-size: 2.2vw; line-height: 1; }
+        .h-txt p { margin: 5px 0 0; font-size: 1.4vw; color: #ffeb3b; }
 
-        #relogio { font-size: 4vw; font-weight: bold; }
+        #relogio { font-size: 4.5vw; font-weight: bold; font-family: monospace; }
 
-        /* A MÁGICA ESTÁ AQUI: COLUNAS TIPO JORNAL */
+        /* AREA DOS DADOS - ESTILO MULTI-COLUNAS */
         main {
             flex: 1;
-            padding: 15px;
-            /* Divide a tela em colunas verticais */
-            column-count: 3; 
-            column-gap: 20px;
-            column-rule: 1px solid #333;
+            padding: 20px;
+            /* Se tiver muita gente, o sistema cria 2 ou 3 colunas sozinho */
+            column-count: 2; 
+            column-gap: 30px;
+            column-rule: 2px solid #333;
+            overflow: hidden;
         }
 
         .categoria-card {
-            break-inside: avoid; /* Não deixa o quadro quebrar entre colunas */
+            break-inside: avoid; /* Não deixa o card "quebrar" entre colunas */
             background: var(--card);
             border: 2px solid #444;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            padding: 10px;
-            display: inline-block;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            padding: 15px;
             width: 100%;
+            display: inline-block; /* Necessário para column-count */
         }
 
         .categoria-card h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.8vw;
+            margin: 0 0 15px 0;
+            font-size: 2vw;
             color: var(--accent);
             text-align: center;
-            border-bottom: 3px solid var(--accent);
-            padding-bottom: 5px;
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 8px;
+            text-transform: uppercase;
         }
 
         .especialidade-label {
-            font-size: 1.3vw;
+            font-size: 1.4vw;
             color: #ff9800;
-            margin: 10px 0 5px 0;
-            border-left: 5px solid #ff9800;
-            padding-left: 10px;
+            margin: 15px 0 8px 0;
+            border-left: 6px solid #ff9800;
+            padding-left: 12px;
+            text-transform: uppercase;
         }
 
         .plantonista-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            margin-bottom: 5px;
+            padding: 15px;
+            margin-bottom: 8px;
             background: #252525;
-            border-radius: 5px;
+            border-radius: 8px;
         }
 
-        /* DESTAQUE MÁXIMO */
+        /* DESTAQUE DO PLANTÃO ATUAL */
         .plantonista-item.ativo {
             background: var(--highlight) !important;
             color: #000 !important;
-            box-shadow: 0 0 20px var(--highlight);
+            box-shadow: 0 0 25px var(--highlight);
         }
 
-        .nome { font-size: 1.7vw; display: block; }
-        .turno { font-size: 0.9vw; font-weight: normal; }
-        .hora { font-size: 1.6vw; font-weight: bold; }
+        .nome { font-size: 1.9vw; font-weight: 900; display: block; line-height: 1.1; }
+        .turno { font-size: 1vw; font-weight: normal; opacity: 0.8; }
+        .hora { font-size: 1.8vw; font-weight: bold; font-family: monospace; }
 
         footer {
             background: #000;
             height: 8vh;
             display: flex;
             align-items: center;
-            border-top: 3px solid #333;
+            border-top: 4px solid #333;
+            flex-shrink: 0;
         }
 
+        .ticker-container { width: 100%; overflow: hidden; }
         .ticker {
-            white-space: nowrap;
             display: inline-block;
-            animation: ticker 90s linear infinite;
+            white-space: nowrap;
+            animation: ticker 120s linear infinite; /* Lento para leitura */
             font-size: 2vw;
             color: #00ff00;
             font-weight: bold;
@@ -119,7 +125,7 @@
 
         @keyframes ticker {
             0% { transform: translateX(100%); }
-            100% { transform: translateX(-200%); }
+            100% { transform: translateX(-300%); }
         }
     </style>
 </head>
@@ -128,7 +134,7 @@
 <header>
     <div class="h-txt">
         <h1>PS OBSTÉTRICO - MONS. ANTONIO BARROS</h1>
-        <p>SESAP - RIO GRANDE DO NORTE</p>
+        <p>SESAP - GOVERNO DO RIO GRANDE DO NORTE</p>
     </div>
     <div id="relogio">00:00:00</div>
 </header>
@@ -136,7 +142,7 @@
 <main id="painel-grid"></main>
 
 <footer>
-    <div style="width:100%; overflow:hidden;">
+    <div class="ticker-container">
         <div class="ticker" id="noticias">BUSCANDO NOTÍCIAS G1 RN...</div>
     </div>
 </footer>
@@ -147,11 +153,12 @@
 
     async function buscarNoticias() {
         try {
-            const res = await fetch(URL_NOTICIAS);
+            // Adicionado timestamp para evitar cache do navegador nas notícias
+            const res = await fetch(URL_NOTICIAS + "&t=" + Date.now());
             const data = await res.json();
-            const manchetes = data.items.slice(0, 6).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
+            const manchetes = data.items.slice(0, 5).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
             document.getElementById('noticias').innerText = manchetes + " +++ FONTE: G1 RN +++";
-        } catch (e) { document.getElementById('noticias').innerText = "+++ SESAP RN +++"; }
+        } catch (e) { document.getElementById('noticias').innerText = "+++ ESCALA ATUALIZADA - SESAP RN +++"; }
     }
 
     function checarAtivo(ini, fim) {
@@ -167,7 +174,8 @@
 
     async function carregarDados() {
         try {
-            const res = await fetch(URL_TSV + "&nocache=" + new Date().getTime());
+            // ANTICACHE: Adiciona um número aleatório à URL para o GitHub sempre entregar o arquivo novo
+            const res = await fetch(URL_TSV + "&nocache=" + Date.now());
             const texto = await res.text();
             const linhas = texto.split('\n').slice(1).map(l => l.split('\t'));
             
@@ -178,7 +186,7 @@
             linhas.forEach(col => {
                 if (col.length < 5) return;
                 let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
-                const espKey = especialidade || "GERAL";
+                const espKey = especialidade || "SEM_ESP";
                 if (!categorias[cargo]) categorias[cargo] = {};
                 if (!categorias[cargo][espKey]) categorias[cargo][espKey] = [];
                 categorias[cargo][espKey].push({nome, turno, inicio, fim});
@@ -189,7 +197,7 @@
                 card.className = 'categoria-card';
                 let html = `<h2>${cargo}</h2>`;
                 for (const esp in categorias[cargo]) {
-                    if (esp !== "GERAL") html += `<div class="especialidade-label">${esp}</div>`;
+                    if (esp !== "SEM_ESP") html += `<div class="especialidade-label">${esp}</div>`;
                     categorias[cargo][esp].forEach(p => {
                         const ativo = checarAtivo(p.inicio, p.fim);
                         html += `
@@ -205,12 +213,13 @@
                 card.innerHTML = html;
                 grid.appendChild(card);
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Erro na carga:", e); }
     }
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
-    setInterval(carregarDados, 30000);
-    setInterval(buscarNoticias, 1800000);
+    setInterval(carregarDados, 30000); // 30 segundos
+    setInterval(buscarNoticias, 1800000); // 30 minutos
+    
     carregarDados(); buscarNoticias();
 </script>
 </body>
