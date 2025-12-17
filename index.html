@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAINEL DE ESCALA - MONS. ANTONIO BARROS</title>
+    <title>ESCALA LINEAR - MONS. ANTONIO BARROS</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
             --highlight: #ffff00;
             --bg: #050505;
-            --card: #1a1a1a;
+            --card-inner: #222;
             --accent: #00aaff;
         }
 
@@ -32,55 +32,61 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 40px;
-            border-bottom: 6px solid #fff;
+            padding: 0 30px;
+            border-bottom: 5px solid #fff;
             flex-shrink: 0;
         }
 
-        .h-txt h1 { margin: 0; font-size: 2.2vw; line-height: 1; }
-        .h-txt p { margin: 5px 0 0; font-size: 1.4vw; color: #ffeb3b; }
-
+        .h-txt h1 { margin: 0; font-size: 2.2vw; }
         #relogio { font-size: 4.5vw; font-weight: bold; font-family: monospace; }
 
-        /* AREA DOS DADOS - ESTILO MULTI-COLUNAS */
+        /* LAYOUT LINEAR (LADO A LADO) */
         main {
             flex: 1;
-            padding: 20px;
-            /* Se tiver muita gente, o sistema cria 2 ou 3 colunas sozinho */
-            column-count: 3; 
-            column-gap: 30px;
-            column-rule: 2px solid #333;
-            overflow: hidden;
+            display: flex; /* Alinha as categorias em linha */
+            flex-direction: row;
+            padding: 10px;
+            gap: 15px;
+            overflow-x: auto; /* Se houver muitas colunas, permite rolar pros lados */
+            background: #111;
         }
 
-        .categoria-card {
-            break-inside: avoid; /* Não deixa o card "quebrar" entre colunas */
-            background: var(--card);
+        .categoria-coluna {
+            flex: 1; /* Faz todas as colunas terem o mesmo tamanho */
+            min-width: 300px; /* Largura mínima para não espremer nomes */
+            background: var(--card-inner);
             border: 2px solid #444;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            padding: 15px;
-            width: 100%;
-            display: inline-block; /* Necessário para column-count */
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ocupa toda a altura disponível */
         }
 
-        .categoria-card h2 {
-            margin: 0 0 15px 0;
-            font-size: 2vw;
+        .categoria-coluna h2 {
+            margin: 0;
+            padding: 15px;
+            font-size: 1.8vw;
             color: var(--accent);
             text-align: center;
+            background: #000;
             border-bottom: 4px solid var(--accent);
-            padding-bottom: 8px;
-            text-transform: uppercase;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .lista-plantonistas {
+            flex: 1;
+            overflow-y: auto; /* SCROLL INDIVIDUAL: Só os nomes rolam se não couberem */
+            padding: 10px;
         }
 
         .especialidade-label {
-            font-size: 1.4vw;
+            font-size: 1.2vw;
             color: #ff9800;
-            margin: 15px 0 8px 0;
-            border-left: 6px solid #ff9800;
-            padding-left: 12px;
+            margin: 15px 0 5px 0;
+            font-weight: bold;
             text-transform: uppercase;
+            border-left: 5px solid #ff9800;
+            padding-left: 10px;
         }
 
         .plantonista-item {
@@ -89,35 +95,33 @@
             align-items: center;
             padding: 15px;
             margin-bottom: 8px;
-            background: #252525;
+            background: #333;
             border-radius: 8px;
         }
 
-        /* DESTAQUE DO PLANTÃO ATUAL */
+        /* DESTAQUE DO PLANTÃO */
         .plantonista-item.ativo {
             background: var(--highlight) !important;
             color: #000 !important;
-            box-shadow: 0 0 25px var(--highlight);
+            font-weight: 900;
+            box-shadow: 0 0 15px var(--highlight);
         }
 
-        .nome { font-size: 1.9vw; font-weight: 900; display: block; line-height: 1.1; }
-        .turno { font-size: 1vw; font-weight: normal; opacity: 0.8; }
-        .hora { font-size: 1.8vw; font-weight: bold; font-family: monospace; }
+        .nome { font-size: 1.7vw; display: block; line-height: 1.1; }
+        .hora { font-size: 1.5vw; font-weight: bold; font-family: monospace; }
 
         footer {
             background: #000;
             height: 8vh;
             display: flex;
             align-items: center;
-            border-top: 4px solid #333;
+            border-top: 3px solid #333;
             flex-shrink: 0;
         }
 
-        .ticker-container { width: 100%; overflow: hidden; }
         .ticker {
-            display: inline-block;
             white-space: nowrap;
-            animation: ticker 120s linear infinite; /* Lento para leitura */
+            animation: ticker 100s linear infinite;
             font-size: 2vw;
             color: #00ff00;
             font-weight: bold;
@@ -125,25 +129,29 @@
 
         @keyframes ticker {
             0% { transform: translateX(100%); }
-            100% { transform: translateX(-300%); }
+            100% { transform: translateX(-350%); }
         }
+
+        /* Esconder barra de scroll para ficar visual de TV */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="h-txt">
-        <h1>PS OBSTÉTRICO - MONS. ANTONIO BARROS</h1>
-        <p>SESAP - GOVERNO DO RIO GRANDE DO NORTE</p>
+        <h1>PRONTO SOCORRO OBSTÉTRICO</h1>
+        <p>HOSP. REG. MONS. ANTONIO BARROS | SESAP-RN</p>
     </div>
     <div id="relogio">00:00:00</div>
 </header>
 
-<main id="painel-grid"></main>
+<main id="painel-linear">
+    </main>
 
 <footer>
-    <div class="ticker-container">
-        <div class="ticker" id="noticias">BUSCANDO NOTÍCIAS G1 RN...</div>
+    <div style="width:100%; overflow:hidden;">
+        <div class="ticker" id="noticias">BUSCANDO NOTÍCIAS RN...</div>
     </div>
 </footer>
 
@@ -153,12 +161,10 @@
 
     async function buscarNoticias() {
         try {
-            // Adicionado timestamp para evitar cache do navegador nas notícias
-            const res = await fetch(URL_NOTICIAS + "&t=" + Date.now());
+            const res = await fetch(URL_NOTICIAS + "?t=" + Date.now());
             const data = await res.json();
-            const manchetes = data.items.slice(0, 5).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
-            document.getElementById('noticias').innerText = manchetes + " +++ FONTE: G1 RN +++";
-        } catch (e) { document.getElementById('noticias').innerText = "+++ ESCALA ATUALIZADA - SESAP RN +++"; }
+            document.getElementById('noticias').innerText = data.items.slice(0, 6).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
+        } catch (e) { document.getElementById('noticias').innerText = "+++ SESAP RN +++"; }
     }
 
     function checarAtivo(ini, fim) {
@@ -174,54 +180,14 @@
 
     async function carregarDados() {
         try {
-            // ANTICACHE: Adiciona um número aleatório à URL para o GitHub sempre entregar o arquivo novo
             const res = await fetch(URL_TSV + "&nocache=" + Date.now());
             const texto = await res.text();
             const linhas = texto.split('\n').slice(1).map(l => l.split('\t'));
             
-            const grid = document.getElementById('painel-grid');
-            grid.innerHTML = '';
+            const container = document.getElementById('painel-linear');
+            container.innerHTML = '';
             const categorias = {};
 
             linhas.forEach(col => {
                 if (col.length < 5) return;
-                let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
-                const espKey = especialidade || "SEM_ESP";
-                if (!categorias[cargo]) categorias[cargo] = {};
-                if (!categorias[cargo][espKey]) categorias[cargo][espKey] = [];
-                categorias[cargo][espKey].push({nome, turno, inicio, fim});
-            });
-
-            for (const cargo in categorias) {
-                const card = document.createElement('div');
-                card.className = 'categoria-card';
-                let html = `<h2>${cargo}</h2>`;
-                for (const esp in categorias[cargo]) {
-                    if (esp !== "SEM_ESP") html += `<div class="especialidade-label">${esp}</div>`;
-                    categorias[cargo][esp].forEach(p => {
-                        const ativo = checarAtivo(p.inicio, p.fim);
-                        html += `
-                            <div class="plantonista-item ${ativo ? 'ativo' : ''}">
-                                <div class="p-info">
-                                    <span class="nome">${p.nome}</span>
-                                    <span class="turno">${p.turno}</span>
-                                </div>
-                                <div class="hora">${p.inicio} - ${p.fim}</div>
-                            </div>`;
-                    });
-                }
-                card.innerHTML = html;
-                grid.appendChild(card);
-            }
-        } catch(e) { console.error("Erro na carga:", e); }
-    }
-
-    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
-    setInterval(carregarDados, 30000); // 30 segundos
-    setInterval(buscarNoticias, 1800000); // 30 minutos
-    
-    carregarDados(); buscarNoticias();
-</script>
-</body>
-</html>
-
+                let [nome, cargo, especialidade, turno, inicio, fim] =
