@@ -133,85 +133,95 @@
 </main>
 
 <footer>
-    <div class="news-ticker" id="ticker-text">
-        +++ BEM-VINDO AO PORTAL DE ESCALAS DO HOSPITAL REGIONAL MONSENHOR ANTONIO BARROS +++ MANTENHA A ESCALA ATUALIZADA VIA DISPOSITIVO MÓVEL +++ SESAP RN +++
+    <div class="ticker-wrap">
+        <div class="ticker" id="ticker-noticias">
+            Carregando notícias do RN...
+        </div>
     </div>
 </footer>
 
 <script>
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
+    const URL_TSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
+    // RSS do G1 Rio Grande do Norte convertido para JSON
+    const URL_NOTICIAS = "https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml";
 
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('pt-BR');
-        document.getElementById('date').innerText = now.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    function atualizarRelogio() {
+        const agora = new Date();
+        document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-BR');
+        document.getElementById('data-extenso').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
-    async function fetchData() {
+    async function buscarNoticias() {
         try {
-            const response = await fetch(SHEET_URL);
-            const tsvData = await response.text();
-            const rows = tsvData.split('\n').map(row => row.split('\t'));
-            renderDashboard(rows.slice(1)); // Remove o cabeçalho
-        } catch (err) {
-            console.error("Erro ao ler planilha:", err);
+            const res = await fetch(URL_NOTICIAS);
+            const data = await res.json();
+            const manchetes = data.items.map(item => `+++ ${item.title.toUpperCase()}`).join(" ");
+            document.getElementById('ticker-noticias').innerText = manchetes + " +++ FONTE: G1 RN +++";
+        } catch (e) {
+            document.getElementById('ticker-noticias').innerText = "+++ HOSPITAL REGIONAL MONSENHOR ANTONIO BARROS - SESAP RN +++";
         }
     }
 
-    function isAtivo(inicio, fim) {
-        const agora = new Date();
-        const [hI, mI] = inicio.split(':').map(Number);
-        const [hF, mF] = fim.split(':').map(Number);
-        
-        const totalAgora = agora.getHours() * 60 + agora.getMinutes();
-        const totalInicio = hI * 60 + mI;
-        let totalFim = hF * 60 + mF;
-
-        if (totalFim < totalInicio) totalFim += 1440; // Trata virada de noite
-        return totalAgora >= totalInicio && totalAgora < totalFim;
+    async function carregarDados() {
+        try {
+            const res = await fetch(URL_TSV);
+            const texto = await res.text();
+            const linhas = texto.split('\n').map(l => l.split('\t'));
+            montarPainel(linhas.slice(1)); 
+        } catch (e) {
+            console.error("Erro ao carregar Sheets:", e);
+        }
     }
 
-    function renderDashboard(data) {
-        const container = document.getElementById('dashboard');
-        container.innerHTML = '';
+    function checarPlantaoAtivo(inicio, fim) {
+        const agora = new Date();
+        const minAtual = agora.getHours() * 60 + agora.getMinutes();
+        const [hI, mI] = inicio.split(':').map(Number);
+        const [hF, mF] = fim.split(':').map(Number);
+        let minInicio = hI * 60 + mI;
+        let minFim = hF * 60 + mF;
+        if (minFim < minInicio) return (minAtual >= minInicio || minAtual < minFim);
+        return (minAtual >= minInicio && minAtual < minFim);
+    }
 
+    function montarPainel(dados) {
+        const grid = document.getElementById('painel-grid');
+        grid.innerHTML = '';
         const categorias = {};
-        
-        data.forEach(item => {
-            if (item.length < 5) return;
-            const [nome, cargo, especialidade, turno, inicio, fim] = item;
+        dados.forEach(col => {
+            if (col.length < 5) return;
+            const [nome, cargo, especialidade, turno, inicio, fim] = col;
             if (!categorias[cargo]) categorias[cargo] = [];
             categorias[cargo].push({nome, especialidade, turno, inicio, fim});
         });
 
-        for (const [cargo, pessoas] of Object.entries(categorias)) {
-            const group = document.createElement('div');
-            group.className = 'category-group';
-            group.innerHTML = `<h2>${cargo}</h2>`;
-
-            pessoas.forEach(p => {
-                const ativo = isAtivo(p.inicio, p.fim);
-                const card = document.createElement('div');
-                card.className = `row-plantonista ${ativo ? 'active-now' : ''}`;
-                card.innerHTML = `
-                    <div class="info-main">
-                        <div class="nome">${p.nome.trim()}</div>
-                        <div class="info-sub">${p.especialidade} | ${p.turno}</div>
+        for (const cargo in categorias) {
+            const card = document.createElement('div');
+            card.className = 'categoria-card';
+            card.innerHTML = `<h2>${cargo}</h2>`;
+            categorias[cargo].forEach(p => {
+                const ativo = checarPlantaoAtivo(p.inicio, p.fim);
+                const item = document.createElement('div');
+                item.className = `plantonista-item ${ativo ? 'ativo' : ''}`;
+                item.innerHTML = `
+                    <div class="p-info">
+                        <span class="nome">${p.nome}</span>
+                        <span class="esp">${p.especialidade} | ${p.turno}</span>
                     </div>
-                    <div class="info-time">
-                        ${p.inicio.trim()} - ${p.fim.trim()}
-                    </div>
+                    <div class="p-hora">${p.inicio} - ${p.fim}</div>
                 `;
-                group.appendChild(card);
+                card.appendChild(item);
             });
-            container.appendChild(group);
+            grid.appendChild(card);
         }
     }
 
-    setInterval(updateTime, 1000);
-    setInterval(fetchData, 30000); // Atualiza dados a cada 30 seg
-    fetchData();
-    updateTime();
+    // Inicialização
+    setInterval(atualizarRelogio, 1000);
+    setInterval(carregarDados, 30000); // 30 seg para escala
+    setInterval(buscarNoticias, 1800000); // 30 min para notícias
+    
+    atualizarRelogio();
+    carregarDados();
+    buscarNoticias();
 </script>
-</body>
-</html>
