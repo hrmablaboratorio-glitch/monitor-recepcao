@@ -14,70 +14,58 @@
             --ticker-green: #00ff00;
         }
 
-        /* CONFIGURAÇÃO BASE - FOCO NA TV */
         html, body { 
             margin: 0; padding: 0; 
-            height: 100vh; width: 100vw;
+            min-height: 100vh; width: 100vw;
             background-color: var(--bg);
             font-family: 'Arial Black', sans-serif;
             color: white;
-            overflow: hidden; /* Trava o scroll na TV */
         }
 
-        body { display: flex; flex-direction: column; }
+        body { display: flex; flex-direction: column; overflow-x: hidden; }
 
-        /* HEADER - COM LOGO SESAP */
+        /* HEADER - Ajustado para ser responsivo */
         header {
             background: var(--sesap-blue);
-            height: 15vh;
+            min-height: 12vh;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2vw;
+            padding: 10px 3vw;
             border-bottom: 5px solid #fff;
             flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
-
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        
-        .logo-box { 
-            background: white; 
-            padding: 8px; 
-            border-radius: 8px; 
-            display: flex; 
-            align-items: center;
-            height: 10vh;
-        }
-        .logo-box img { height: 100%; width: auto; }
 
         header h1 { 
             margin: 0; 
-            font-size: 2vw; 
+            font-size: 2.2vw; 
             color: white; 
             text-transform: uppercase;
             line-height: 1.1;
         }
 
-        .header-right { text-align: right; min-width: 25vw; }
-        #data-atual { font-size: 1.2vw; font-weight: bold; text-transform: uppercase; }
-        #relogio { font-size: 5.5vw; font-weight: bold; font-family: monospace; line-height: 1; margin-top: -5px; }
+        .header-right { text-align: right; display: flex; flex-direction: column; }
+        #data-atual { font-size: 1.4vw; font-weight: bold; text-transform: uppercase; }
+        #relogio { font-size: 4.5vw; font-weight: bold; font-family: monospace; line-height: 1; }
 
-        /* GRID DA ESCALA - MODO TV */
+        /* GRID DA ESCALA */
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 5px;
-            gap: 5px;
-            min-height: 0;
+            gap: 10px;
+            padding: 10px;
         }
 
         .categoria-linha {
-            flex: 1;
             display: flex;
+            flex-direction: row; 
             background: #111;
             border: 1px solid var(--border);
-            min-height: 0;
+            min-height: 12vh;
         }
 
         .cargo-titulo {
@@ -87,9 +75,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1vw;
+            font-size: 1.1vw;
             text-align: center;
-            padding: 5px;
+            padding: 10px;
             font-weight: 900;
             text-transform: uppercase;
             border-right: 3px solid #fff;
@@ -100,10 +88,12 @@
             flex: 1;
             display: flex;
             flex-direction: row;
+            flex-wrap: wrap;
         }
 
         .plantonista-box {
             flex: 1;
+            min-width: 200px; /* Garante que na TV eles fiquem lado a lado */
             background: #151515;
             display: flex;
             flex-direction: column;
@@ -111,8 +101,7 @@
             align-items: center;
             text-align: center;
             border-right: 1px solid var(--border);
-            padding: 5px;
-            overflow: hidden;
+            padding: 15px;
         }
 
         .plantonista-box.ativo {
@@ -120,13 +109,13 @@
             color: #000 !important;
         }
 
-        .nome { font-size: 2.2vw; font-weight: 900; text-transform: uppercase; line-height: 1; }
-        .info-sub { font-size: 1.1vw; font-weight: bold; margin-top: 4px; }
+        .nome { font-size: 1.8vw; font-weight: 900; text-transform: uppercase; word-wrap: break-word; }
+        .info-sub { font-size: 1.1vw; font-weight: bold; margin-top: 5px; }
 
         /* FOOTER */
         footer {
             background: #000;
-            height: 7vh;
+            height: 60px;
             display: flex;
             align-items: center;
             border-top: 4px solid var(--ticker-green);
@@ -138,50 +127,54 @@
             display: inline-block;
             padding-left: 100%;
             animation: ticker-move 180s linear infinite;
-            font-size: 2.5vw;
+            font-size: 20px;
             color: var(--ticker-green);
             font-weight: bold;
         }
 
-        @keyframes ticker-move { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        @keyframes ticker-move {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
 
-        /* ----------------------------------------------------------- */
-        /* MODO CELULAR - SÓ ATIVA SE A TELA FOR MENOR QUE 800PX */
-        /* ----------------------------------------------------------- */
-        @media (max-width: 800px) {
-            html, body { overflow-y: auto; height: auto; }
-            header { flex-direction: column; height: auto; padding: 15px; gap: 10px; }
-            .header-left { flex-direction: column; gap: 10px; }
-            .logo-box { height: 60px; }
-            header h1 { font-size: 5vw; text-align: center; }
-            .header-right { width: 100%; text-align: center; }
+        /* MEDIA QUERY: AJUSTES ESPECÍFICOS PARA CELULAR */
+        @media (max-width: 768px) {
+            header { flex-direction: column; height: auto; padding: 15px; text-align: center; }
+            header h1 { font-size: 5.5vw; margin-bottom: 10px; }
+            .header-right { text-align: center; align-items: center; }
             #data-atual { font-size: 4vw; }
-            #relogio { font-size: 15vw; margin-top: 5px; }
-            
-            main { height: auto; overflow: visible; padding-bottom: 80px; }
+            #relogio { font-size: 14vw; }
+
             .categoria-linha { flex-direction: column; height: auto; margin-bottom: 10px; border: 2px solid #555; }
-            .cargo-titulo { width: 100%; font-size: 5vw; padding: 12px 0; border-right: none; border-bottom: 3px solid #fff; }
+            .cargo-titulo { 
+                width: 100%; 
+                font-size: 5vw; 
+                padding: 12px 0; 
+                border-right: none; 
+                border-bottom: 3px solid #fff;
+            }
+
             .profissionais-container { flex-direction: column; }
-            .plantonista-box { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 25px 0; }
+            .plantonista-box { 
+                width: 100%; 
+                min-width: unset;
+                border-right: none; 
+                border-bottom: 1px solid var(--border);
+                padding: 20px 10px;
+            }
+            /* Aumenta a fonte no celular para facilitar leitura */
+            .nome { font-size: 6vw !important; } 
+            .info-sub { font-size: 4.5vw !important; }
             
-            /* Fontes GIGANTES no celular para leitura fácil */
-            .nome { font-size: 7vw !important; }
-            .info-sub { font-size: 5vw !important; }
-            
-            footer { height: 60px; position: fixed; bottom: 0; width: 100%; z-index: 2000; }
-            .ticker { font-size: 18px; }
+            main { overflow-y: visible; }
+            html, body { overflow-y: auto; height: auto; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-left">
-        <div class="logo-box">
-            <img src="Logo_GOV_Transp.png">
-        </div>
-        <h1>PS OBSTÉTRICO<br>HOSPITAL REGIONAL MONS. ANTONIO BARROS</h1>
-    </div>
+    <h1>PS OBSTÉTRICO<br>HOSPITAL REGIONAL MONS. ANTONIO BARROS</h1>
     <div class="header-right">
         <div id="data-atual">CARREGANDO...</div>
         <div id="relogio">00:00:00</div>
@@ -195,13 +188,12 @@
 </footer>
 
 <script>
-    const URL_TSV = "Logo_GOV_Transp.png";
+    const URL_TSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
 
     function atualizarTempo() {
         const agora = new Date();
-        const dias = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
-        const dataFormatada = `${dias[agora.getDay()]}, ${agora.toLocaleDateString('pt-BR')}`;
-        document.getElementById('data-atual').innerText = dataFormatada;
+        const opcoes = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+        document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-BR', opcoes).toUpperCase();
         document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-BR');
     }
 
@@ -238,9 +230,9 @@
                 linhaDiv.className = 'categoria-linha';
                 categorias[chave].sort((a, b) => b.ativo - a.ativo);
                 
+                // Lógica de fonte para a TV: Se tiver muitos (Técnicos), diminui um pouco
                 let total = categorias[chave].length;
-                // Ajuste de fonte dinâmico para a TV (Desktop)
-                let fontTV = total > 3 ? '1.5vw' : (total === 3 ? '1.8vw' : '2.2vw');
+                let fontTV = total > 3 ? '1.5vw' : '1.8vw';
 
                 let html = `<div class="cargo-titulo">${chave}</div><div class="profissionais-container">`;
                 categorias[chave].forEach(p => {
@@ -273,5 +265,3 @@
 </script>
 </body>
 </html>
-
-
