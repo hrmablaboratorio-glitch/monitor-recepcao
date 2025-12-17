@@ -123,13 +123,43 @@
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
+        .header-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #data-atual {
+            font-size: 1.2vw;
+            color: #FFFFFF; /* Branco */
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: -5px; /* Cola a data no relógio */
+        }
+
+        #relogio {
+            font-size: 4vw;
+            font-weight: bold;
+            color: #FFFFFF; /* Branco */
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>PS OBSTÉTRICO - HOSPITAL REGIONAL MONS. ANTONIO BARROS</h1>
-    <div id="relogio">00:00:00</div>
+    <div class="header-left">
+        <div class="logo-box">
+            <img src="logo_rn.png" alt="Logo Governo" class="logo-img">
+        </div>
+        <h1>PS OBSTÉTRICO<br>MONS. ANTONIO BARROS</h1>
+    </div>
+    
+    <div class="header-right">
+        <div id="data-atual">CARREGANDO DATA...</div>
+        <div id="relogio">00:00:00</div>
+    </div>
 </header>
 
 <main id="painel-horizontal"></main>
@@ -242,6 +272,7 @@
 </script>
 </body>
 </html>
+
 
 
 
