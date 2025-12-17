@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAINEL DE ESCALA - MONSENHOR ANTONIO BARROS</title>
+    <title>PAINEL DE ESCALA - HOSPITAL MONSENHOR ANTONIO BARROS</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
@@ -14,122 +14,121 @@
             --accent: #00aaff;
         }
 
+        /* Reset para ocupar 100% da tela sem margens */
+        * { box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Arial, Black, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background-color: var(--bg-body);
             color: var(--text);
             margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            overflow: hidden;
+            overflow: hidden; /* Proíbe scroll na página toda */
         }
 
         header {
             background-color: var(--sesap-blue);
-            padding: 20px 40px;
+            padding: 10px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 6px solid #fff;
-            flex-shrink: 0;
+            border-bottom: 4px solid #fff;
+            height: 12vh; /* Altura fixa proporcional */
         }
 
-        .header-titles h1 { margin: 0; font-size: 32px; text-transform: uppercase; letter-spacing: 2px; }
-        .header-titles p { margin: 5px 0 0; font-size: 22px; color: #fff; font-weight: bold; }
+        .header-titles h1 { margin: 0; font-size: 1.8vw; text-transform: uppercase; }
+        .header-titles p { margin: 2px 0 0; font-size: 1.2vw; font-weight: bold; }
 
-        #relogio-container { text-align: right; }
-        #relogio { font-size: 55px; font-weight: bold; font-family: 'Courier New', monospace; line-height: 1; }
-        #data-extenso { font-size: 18px; text-transform: uppercase; color: #add8e6; }
+        #relogio { font-size: 3.5vw; font-weight: bold; font-family: monospace; }
 
-        /* Grade do Painel Ocupando Tudo */
-        #painel-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            padding: 25px;
-            flex-grow: 1;
-            align-items: stretch;
+        /* Painel Responsivo */
+        main {
+            flex: 1; /* Ocupa todo o espaço entre header e footer */
+            display: flex;
+            flex-wrap: wrap; /* Permite quebrar linha se não couber */
+            gap: 15px;
+            padding: 15px;
+            overflow-y: auto; /* Se houver gente demais, o scroll é só aqui */
+            justify-content: center;
+            align-content: flex-start;
         }
 
         .categoria-card {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 15px;
             border: 2px solid #333;
+            flex: 1 1 400px; /* Alarga até 400px e depois quebra */
+            max-width: 600px;
             display: flex;
             flex-direction: column;
         }
 
         .categoria-card h2 {
-            margin: 0 0 20px 0;
-            font-size: 30px; /* Fonte Grande */
+            margin: 0 0 10px 0;
+            font-size: 2vw;
             color: var(--accent);
             text-align: center;
-            text-transform: uppercase;
             background: #222;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
-            border-bottom: 4px solid var(--accent);
+            border-bottom: 3px solid var(--accent);
         }
 
         .especialidade-label {
-            font-size: 20px;
+            font-size: 1.2vw;
             color: #ff9800;
-            margin: 15px 0 10px 10px;
+            margin: 10px 0 5px 10px;
             font-weight: bold;
             text-transform: uppercase;
-            border-left: 5px solid #ff9800;
-            padding-left: 15px;
+            border-left: 4px solid #ff9800;
+            padding-left: 10px;
         }
 
         .plantonista-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
             background: #252525;
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
-        /* ESTILO QUANDO ATIVO - FONTE EXTRA GRANDE */
         .plantonista-item.ativo {
             background-color: var(--highlight) !important;
             color: #000 !important;
-            transform: scale(1.02);
-            box-shadow: 0 0 25px rgba(255, 255, 0, 0.3);
+            font-weight: 900;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.2);
         }
 
-        .p-info .nome { font-size: 26px; font-weight: 900; display: block; text-transform: uppercase; }
-        .p-info .turno-label { font-size: 14px; background: #444; padding: 4px 8px; border-radius: 5px; font-weight: bold; }
-        .ativo .turno-label { background: #000; color: #fff; }
+        .p-info .nome { font-size: 1.6vw; display: block; text-transform: uppercase; }
+        .p-info .turno-label { font-size: 0.9vw; background: #444; padding: 2px 6px; border-radius: 4px; }
         
-        .p-hora { font-size: 24px; font-weight: bold; font-family: monospace; }
+        .p-hora { font-size: 1.4vw; font-weight: bold; font-family: monospace; }
 
-        /* Rodapé de Notícias Lento */
+        /* Rodapé Fixo */
         footer { 
             background: #000; 
-            color: #00ff00; 
-            height: 60px; 
+            height: 6vh; 
             display: flex; 
             align-items: center; 
-            flex-shrink: 0;
-            border-top: 3px solid #222;
+            border-top: 2px solid #333;
         }
 
-        .ticker-wrap { width: 100%; overflow: hidden; }
         .ticker { 
-            display: inline-block;
             white-space: nowrap; 
-            padding-left: 100%; 
-            animation: ticker-anim 120s linear infinite; /* Bem mais lento */
-            font-size: 26px; /* Letra maior para ler de longe */
-            font-weight: bold;
+            animation: ticker-anim 100s linear infinite; 
+            font-size: 1.5vw; 
+            font-weight: bold; 
+            color: #00ff00;
         }
 
-        @keyframes ticker-anim { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+        @keyframes ticker-anim { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
     </style>
 </head>
 <body>
@@ -139,17 +138,15 @@
         <h1>PS OBSTÉTRICO - MONS. ANTONIO BARROS</h1>
         <p>SESAP - GOVERNO DO RIO GRANDE DO NORTE</p>
     </div>
-    <div id="relogio-container">
-        <div id="relogio">00:00:00</div>
-        <div id="data-extenso">Aguardando...</div>
-    </div>
+    <div id="relogio">00:00:00</div>
 </header>
 
-<main id="painel-grid"></main>
+<main id="painel-grid">
+    </main>
 
 <footer>
-    <div class="ticker-wrap">
-        <div class="ticker" id="noticias">BUSCANDO ÚLTIMAS NOTÍCIAS DO G1 RN...</div>
+    <div style="width:100%; overflow:hidden;">
+        <div class="ticker" id="noticias">BUSCANDO NOTÍCIAS G1 RN...</div>
     </div>
 </footer>
 
@@ -161,23 +158,20 @@
         try {
             const res = await fetch(URL_NOTICIAS);
             const data = await res.json();
-            // Pega apenas as 5 primeiras notícias para não ficar gigante
-            const manchetes = data.items.slice(0, 5).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
+            const manchetes = data.items.slice(0, 8).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
             document.getElementById('noticias').innerText = manchetes + " +++ FONTE: G1 RN +++";
-        } catch (e) { 
-            document.getElementById('noticias').innerText = "+++ ESCALA ATUALIZADA - HOSPITAL REGIONAL MONSENHOR ANTONIO BARROS +++ SESAP RN +++"; 
-        }
+        } catch (e) { document.getElementById('noticias').innerText = "+++ SESAP RN +++"; }
     }
 
     function checarAtivo(ini, fim) {
         if(!ini || !fim) return false;
-        const agora = new Date();
-        const minAt = agora.getHours() * 60 + agora.getMinutes();
+        const n = new Date();
+        const agora = n.getHours() * 60 + n.getMinutes();
         const [hI, mI] = ini.split(':').map(Number);
         const [hF, mF] = fim.split(':').map(Number);
-        let minI = hI * 60 + mI, minF = hF * 60 + mF;
-        if (minF < minI) return (minAt >= minI || minAt < minF);
-        return (minAt >= minI && minAt < minF);
+        let mI_tot = hI * 60 + mI, mF_tot = hF * 60 + mF;
+        if (mF_tot < mI_tot) return (agora >= mI_tot || agora < mF_tot);
+        return (agora >= mI_tot && agora < mF_tot);
     }
 
     async function carregarDados() {
@@ -193,7 +187,7 @@
             linhas.forEach(col => {
                 if (col.length < 5) return;
                 let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
-                const espKey = especialidade || "SEM_ESP";
+                const espKey = especialidade || "GERAL";
                 if (!categorias[cargo]) categorias[cargo] = {};
                 if (!categorias[cargo][espKey]) categorias[cargo][espKey] = [];
                 categorias[cargo][espKey].push({nome, turno, inicio, fim});
@@ -204,7 +198,7 @@
                 card.className = 'categoria-card';
                 let html = `<h2>${cargo}</h2>`;
                 for (const esp in categorias[cargo]) {
-                    if (esp !== "SEM_ESP") html += `<div class="especialidade-label">${esp}</div>`;
+                    if (esp !== "GERAL") html += `<div class="especialidade-label">${esp}</div>`;
                     categorias[cargo][esp].forEach(p => {
                         const ativo = checarAtivo(p.inicio, p.fim);
                         html += `
@@ -223,17 +217,10 @@
         } catch(e) { console.error(e); }
     }
 
-    setInterval(() => { 
-        const n = new Date();
-        document.getElementById('relogio').innerText = n.toLocaleTimeString('pt-BR');
-        document.getElementById('data-extenso').innerText = n.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-    }, 1000);
-
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
     setInterval(carregarDados, 30000);
     setInterval(buscarNoticias, 1800000);
-    
-    carregarDados();
-    buscarNoticias();
+    carregarDados(); buscarNoticias();
 </script>
 </body>
 </html>
