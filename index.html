@@ -242,4 +242,34 @@
                 // Ajuste de fonte dinâmico para a TV (Desktop)
                 let fontTV = total > 3 ? '1.5vw' : (total === 3 ? '1.8vw' : '2.2vw');
 
-                let html = `<div class="cargo
+                let html = `<div class="cargo-titulo">${chave}</div><div class="profissionais-container">`;
+                categorias[chave].forEach(p => {
+                    html += `<div class="plantonista-box ${p.ativo ? 'ativo' : ''}">
+                        <div class="nome" style="font-size: ${fontTV}">${p.nome}</div>
+                        <div class="info-sub">${p.inicio} - ${p.fim}</div>
+                    </div>`;
+                });
+                linhaDiv.innerHTML = html + `</div>`;
+                container.appendChild(linhaDiv);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function buscarNoticias() {
+        try {
+            const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml");
+            const data = await res.json();
+            if(data.status === 'ok') {
+                document.getElementById('noticias').innerText = data.items.map(i => `+++ ${i.title.toUpperCase()}`).join("   ");
+            }
+        } catch (e) { }
+    }
+
+    setInterval(atualizarTempo, 1000);
+    setInterval(carregarDados, 30000);
+    setInterval(buscarNoticias, 600000);
+    
+    atualizarTempo(); carregarDados(); buscarNoticias();
+</script>
+</body>
+</html>
