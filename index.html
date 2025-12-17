@@ -7,7 +7,7 @@
     <style>
         :root {
             --sesap-blue: #004a8d;
-            --highlight: #ffff00; /* Amarelo para quem está de plantão */
+            --highlight: #ffff00;
             --bg: #000;
             --accent: #00aaff;
             --border: #444;
@@ -23,10 +23,9 @@
 
         body { display: flex; flex-direction: column; }
 
-        /* CABEÇALHO ATUALIZADO */
         header {
             background: var(--sesap-blue);
-            height: 12vh;
+            height: 9vh;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -35,45 +34,9 @@
             flex-shrink: 0;
         }
 
-       .header-left {
-            display: flex;
-            align-items: center;
-            gap: 30px; /* Aumentei de 20 para 30 para afastar o texto da logo */
-        }
+        header h1 { margin: 0; font-size: 2.2vw; color: white; text-transform: uppercase; }
+        #relogio { font-size: 3.5vw; font-weight: bold; color: white; font-family: monospace; }
 
-        .logo-box {
-            background: #fff;
-            padding: 8px 15px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        }
-
-        .logo-img {
-            height: 7vh;
-            width: auto;
-            object-fit: contain; /* Garante que a imagem não distorça */
-        }
-        }
-
-        header h1 { 
-            margin: 0; 
-            font-size: 1.8vw; 
-            color: white; 
-            text-transform: uppercase;
-            line-height: 1.1;
-        }
-
-        #relogio {
-            font-size: 4vw;
-            font-weight: bold;
-            color: white;
-            font-family: monospace;
-        }
-
-        /* CORPO DA ESCALA */
         main {
             flex: 1;
             display: flex;
@@ -98,7 +61,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1vw;
+            font-size: 1.1vw;
             text-align: center;
             padding: 5px;
             flex-shrink: 0;
@@ -123,7 +86,7 @@
             align-items: center;
             text-align: center;
             border-right: 1px solid var(--border);
-            padding: 5px;
+            padding: 10px;
         }
 
         .plantonista-box.ativo {
@@ -131,10 +94,9 @@
             color: #000 !important;
         }
 
-        .nome { font-size: 1.8vw; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
-        .info-sub { font-size: 1.1vw; font-weight: bold; margin-top: 4px; }
+        .nome { font-size: 2vw; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
+        .info-sub { font-size: 1.2vw; font-weight: bold; margin-top: 5px; }
 
-        /* RODAPÉ DE NOTÍCIAS */
         footer {
             background: #000;
             height: 7vh;
@@ -149,8 +111,9 @@
         .ticker {
             display: inline-block;
             padding-left: 100%;
-            animation: ticker-move 200s linear infinite;
-            font-size: 2vw;
+            /* Aumentei para 240s porque o texto agora é muito longo */
+            animation: ticker-move 240s linear infinite;
+            font-size: 2.2vw;
             color: #00ff00;
             font-weight: bold;
             text-transform: uppercase;
@@ -165,16 +128,7 @@
 <body>
 
 <header>
-    <div class="header-left">
-       <div class="logo-box">
-    <img src="logo_rn.png" alt="Governo RN" class="logo-img">
-    
-    <div style="width: 2px; height: 5vh; background: #ddd;"></div>
-    
-    <img src="logo_sesap.png" alt="SESAP" class="logo-img">
-</div>
-        <h1>PRONTO-SOCORRO OBSTÉTRICO<br>HOSPITAL REGIONAL MONS. ANTONIO BARROS</h1>
-    </div>
+    <h1>PS OBSTÉTRICO - MONS. ANTONIO BARROS</h1>
     <div id="relogio">00:00:00</div>
 </header>
 
@@ -182,13 +136,14 @@
 
 <footer>
     <div class="ticker-wrap">
-        <div class="ticker" id="noticias">CONECTANDO AOS PORTAIS DE NOTÍCIAS DO RN...</div>
+        <div class="ticker" id="noticias">BUSCANDO NOTÍCIAS DOS PORTAIS DO RN...</div>
     </div>
 </footer>
 
 <script>
     const URL_TSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
     
+    // Lista de Feeds do RN
     const FEEDS = [
         { nome: "G1 RN", url: "https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml" },
         { nome: "TRIBUNA DO NORTE", url: "https://www.tribunadonorte.com.br/feed" },
@@ -196,18 +151,28 @@
     ];
 
     async function buscarNoticias() {
-        let textoCompleto = "";
+        let textoFinal = "";
+        
         for (const feed of FEEDS) {
             try {
                 const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`);
                 const data = await res.json();
+                
                 if(data.status === 'ok') {
-                    textoCompleto += ` [ ${feed.nome} ] — `;
-                    textoCompleto += data.items.slice(0, 6).map(i => i.title.toUpperCase()).join(" +++ ") + " — ";
+                    // Adiciona o cabeçalho da fonte
+                    textoFinal += ` [ FONTE: ${feed.nome} ] — `;
+                    // Pega as 7 primeiras notícias de cada um
+                    const manchetes = data.items.slice(0, 7).map(i => i.title.toUpperCase()).join(" +++ ");
+                    textoFinal += manchetes + " — ";
                 }
-            } catch (e) { console.error("Erro no feed: " + feed.nome); }
+            } catch (e) {
+                console.error("Erro no feed: " + feed.nome);
+            }
         }
-        if(textoCompleto) document.getElementById('noticias').innerText = textoCompleto;
+
+        if(textoFinal !== "") {
+            document.getElementById('noticias').innerText = textoFinal + " +++ ATUALIZADO EM: " + new Date().toLocaleTimeString();
+        }
     }
 
     function checarAtivo(ini, fim) {
@@ -247,10 +212,12 @@
                 const linhaDiv = document.createElement('div');
                 linhaDiv.className = 'categoria-linha';
                 
-                // ORDENAÇÃO: Ativos para a ESQUERDA
+                // ORDENAÇÃO: Ativos primeiro (esquerda)
                 categorias[chave].sort((a, b) => b.ativo - a.ativo);
 
-                let html = `<div class="cargo-titulo">${chave}</div><div class="profissionais-container">`;
+                let html = `<div class="cargo-titulo">${chave}</div>`;
+                html += `<div class="profissionais-container">`;
+                
                 categorias[chave].forEach(p => {
                     html += `
                         <div class="plantonista-box ${p.ativo ? 'ativo' : ''}">
@@ -258,6 +225,7 @@
                             <div class="info-sub">${p.inicio} - ${p.fim}</div>
                         </div>`;
                 });
+                
                 html += `</div>`;
                 linhaDiv.innerHTML = html;
                 container.appendChild(linhaDiv);
@@ -267,11 +235,10 @@
 
     setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
     setInterval(carregarDados, 30000);
-    setInterval(buscarNoticias, 900000);
+    setInterval(buscarNoticias, 900000); // Atualiza notícias a cada 15 min
     
     carregarDados(); 
     buscarNoticias();
 </script>
 </body>
 </html>
-
