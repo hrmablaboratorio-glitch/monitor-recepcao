@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESCALA LINEAR - MONS. ANTONIO BARROS</title>
+    <title>ESCALA HORIZONTAL - MONS. ANTONIO BARROS</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
             --highlight: #ffff00;
             --bg: #050505;
-            --card-inner: #222;
+            --card-bg: #1a1a1a;
             --accent: #00aaff;
         }
 
@@ -40,75 +40,72 @@
         .h-txt h1 { margin: 0; font-size: 2.2vw; }
         #relogio { font-size: 4.5vw; font-weight: bold; font-family: monospace; }
 
-        /* LAYOUT LINEAR (LADO A LADO) */
+        /* AREA PRINCIPAL: LISTA DE LINHAS */
         main {
             flex: 1;
-            display: flex; /* Alinha as categorias em linha */
-            flex-direction: row;
+            display: flex;
+            flex-direction: column; /* Categorias empilhadas uma em cima da outra */
             padding: 10px;
-            gap: 15px;
-            overflow-x: auto; /* Se houver muitas colunas, permite rolar pros lados */
-            background: #111;
+            gap: 10px;
+            overflow-y: auto;
         }
 
-        .categoria-coluna {
-            flex: 1; /* Faz todas as colunas terem o mesmo tamanho */
-            min-width: 300px; /* Largura mínima para não espremer nomes */
-            background: var(--card-inner);
-            border: 2px solid #444;
+        .categoria-linha {
+            background: var(--card-bg);
+            border: 2px solid #333;
             border-radius: 10px;
             display: flex;
-            flex-direction: column;
-            height: 100%; /* Ocupa toda a altura disponível */
-        }
-
-        .categoria-coluna h2 {
-            margin: 0;
-            padding: 15px;
-            font-size: 1.8vw;
-            color: var(--accent);
-            text-align: center;
-            background: #000;
-            border-bottom: 4px solid var(--accent);
-            border-radius: 8px 8px 0 0;
-        }
-
-        .lista-plantonistas {
-            flex: 1;
-            overflow-y: auto; /* SCROLL INDIVIDUAL: Só os nomes rolam se não couberem */
-            padding: 10px;
-        }
-
-        .especialidade-label {
-            font-size: 1.2vw;
-            color: #ff9800;
-            margin: 15px 0 5px 0;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-left: 5px solid #ff9800;
-            padding-left: 10px;
-        }
-
-        .plantonista-item {
-            display: flex;
-            justify-content: space-between;
+            flex-direction: row; /* Nome do cargo e nomes dos profissionais na mesma linha */
             align-items: center;
-            padding: 15px;
-            margin-bottom: 8px;
-            background: #333;
-            border-radius: 8px;
+            min-height: 120px;
+            overflow: hidden;
         }
 
-        /* DESTAQUE DO PLANTÃO */
-        .plantonista-item.ativo {
+        .cargo-titulo {
+            background: var(--accent);
+            color: #000;
+            width: 15vw;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8vw;
+            text-align: center;
+            padding: 10px;
+            flex-shrink: 0;
+            font-weight: 900;
+        }
+
+        .profissionais-container {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap; /* Se não couber na largura, ele cria uma segunda sub-linha */
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .plantonista-box {
+            background: #252525;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 250px;
+            border: 1px solid #444;
+        }
+
+        /* DESTAQUE QUANDO ESTÁ NO HORÁRIO */
+        .plantonista-box.ativo {
             background: var(--highlight) !important;
             color: #000 !important;
-            font-weight: 900;
             box-shadow: 0 0 15px var(--highlight);
+            transform: scale(1.02);
         }
 
-        .nome { font-size: 1.7vw; display: block; line-height: 1.1; }
-        .hora { font-size: 1.5vw; font-weight: bold; font-family: monospace; }
+        .nome { font-size: 1.8vw; font-weight: 900; text-transform: uppercase; }
+        .info-sub { font-size: 1.1vw; font-weight: bold; margin-top: 5px; }
 
         footer {
             background: #000;
@@ -121,7 +118,7 @@
 
         .ticker {
             white-space: nowrap;
-            animation: ticker 100s linear infinite;
+            animation: ticker 120s linear infinite;
             font-size: 2vw;
             color: #00ff00;
             font-weight: bold;
@@ -129,11 +126,10 @@
 
         @keyframes ticker {
             0% { transform: translateX(100%); }
-            100% { transform: translateX(-350%); }
+            100% { transform: translateX(-400%); }
         }
 
-        /* Esconder barra de scroll para ficar visual de TV */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
 <body>
@@ -146,7 +142,7 @@
     <div id="relogio">00:00:00</div>
 </header>
 
-<main id="painel-linear">
+<main id="painel-horizontal">
     </main>
 
 <footer>
@@ -164,7 +160,7 @@
             const res = await fetch(URL_NOTICIAS + "?t=" + Date.now());
             const data = await res.json();
             document.getElementById('noticias').innerText = data.items.slice(0, 6).map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
-        } catch (e) { document.getElementById('noticias').innerText = "+++ SESAP RN +++"; }
+        } catch (e) { document.getElementById('noticias').innerText = "+++ ESCALA ATUALIZADA - SESAP RN +++"; }
     }
 
     function checarAtivo(ini, fim) {
@@ -184,41 +180,37 @@
             const texto = await res.text();
             const linhas = texto.split('\n').slice(1).map(l => l.split('\t'));
             
-            const container = document.getElementById('painel-linear');
+            const container = document.getElementById('painel-horizontal');
             container.innerHTML = '';
             const categorias = {};
 
             linhas.forEach(col => {
                 if (col.length < 5) return;
                 let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
-                const espKey = especialidade || "GERAL";
-                if (!categorias[cargo]) categorias[cargo] = {};
-                if (!categorias[cargo][espKey]) categorias[cargo][espKey] = [];
-                categorias[cargo][espKey].push({nome, turno, inicio, fim});
+                if (!categorias[cargo]) categorias[cargo] = [];
+                categorias[cargo].push({nome, especialidade, turno, inicio, fim});
             });
 
             for (const cargo in categorias) {
-                const coluna = document.createElement('div');
-                coluna.className = 'categoria-coluna';
+                const linhaDiv = document.createElement('div');
+                linhaDiv.className = 'categoria-linha';
                 
-                let html = `<h2>${cargo}</h2><div class="lista-plantonistas">`;
+                let html = `<div class="cargo-titulo">${cargo}</div>`;
+                html += `<div class="profissionais-container">`;
                 
-                for (const esp in categorias[cargo]) {
-                    if (esp !== "GERAL") html += `<div class="especialidade-label">${esp}</div>`;
-                    categorias[cargo][esp].forEach(p => {
-                        const ativo = checarAtivo(p.inicio, p.fim);
-                        html += `
-                            <div class="plantonista-item ${ativo ? 'ativo' : ''}">
-                                <div class="p-info">
-                                    <span class="nome">${p.nome}</span>
-                                </div>
-                                <div class="hora">${p.inicio} - ${p.fim}</div>
-                            </div>`;
-                    });
-                }
+                categorias[cargo].forEach(p => {
+                    const ativo = checarAtivo(p.inicio, p.fim);
+                    const labelEsp = p.especialidade && p.especialidade !== "GERAL" ? ` | ${p.especialidade}` : '';
+                    html += `
+                        <div class="plantonista-box ${ativo ? 'ativo' : ''}">
+                            <div class="nome">${p.nome}</div>
+                            <div class="info-sub">${p.inicio} - ${p.fim}${labelEsp}</div>
+                        </div>`;
+                });
+                
                 html += `</div>`;
-                coluna.innerHTML = html;
-                container.appendChild(coluna);
+                linhaDiv.innerHTML = html;
+                container.appendChild(linhaDiv);
             }
         } catch(e) { console.error(e); }
     }
