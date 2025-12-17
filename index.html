@@ -3,225 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Escala - Hospital Monsenhor Antonio Barros</title>
+    <title>Escala Monsenhor Antonio Barros</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
-            --highlight: #ffff00; /* Amarelo vibrante para destaque */
-            --bg-dark: #1a1a1a;
-            --card-bg: #262626;
-            --text-white: #ffffff;
+            --highlight: #ffff00;
+            --bg-body: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text: #ffffff;
+            --accent: #4db8ff;
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-white);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text);
             margin: 0;
-            padding: 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* Cabeçalho */
         header {
             background-color: var(--sesap-blue);
-            padding: 20px;
+            padding: 10px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 5px solid #fff;
+            border-bottom: 4px solid #fff;
         }
 
-        .logo-area h1 { margin: 0; font-size: 28px; text-transform: uppercase; }
-        .logo-area p { margin: 5px 0 0; font-size: 18px; font-weight: bold; }
+        .header-titles h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
+        #relogio { font-size: 32px; font-weight: bold; font-family: monospace; }
 
-        #clock-container { text-align: right; }
-        #clock { font-size: 40px; font-weight: bold; font-family: monospace; }
-        #date { font-size: 18px; }
-
-        /* Grade do Painel */
-        #dashboard {
+        #painel-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 15px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 12px;
+            padding: 12px;
             flex-grow: 1;
             overflow-y: auto;
         }
 
-        .category-group {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid #444;
+        .categoria-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #333;
         }
 
-        .category-group h2 {
-            margin-top: 0;
-            color: #4db8ff;
-            border-bottom: 2px solid #4db8ff;
-            padding-bottom: 10px;
+        .categoria-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: var(--accent);
             text-align: center;
+            text-transform: uppercase;
+            background: #252525;
+            padding: 6px;
+            border-radius: 4px;
+            border-bottom: 2px solid var(--accent);
         }
 
-        .row-plantonista {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            background: #333;
-            margin-bottom: 8px;
-            padding: 12px;
-            border-radius: 5px;
-            transition: all 0.4s ease;
+        .especialidade-label {
+            font-size: 13px;
+            color: #ff9800; /* Laranja para diferenciar especialidade */
+            margin: 12px 0 5px 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Lógica de Destaque */
-        .active-now {
+        .plantonista-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 4px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            border-left: 4px solid #444;
+        }
+
+        .plantonista-item.ativo {
             background-color: var(--highlight) !important;
             color: #000 !important;
             font-weight: bold;
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+            transform: scale(1.01);
+            border-left: 4px solid #000;
         }
 
-        .info-main { font-size: 18px; }
-        .info-sub { font-size: 14px; opacity: 0.8; }
-        .info-time { text-align: right; font-weight: bold; }
+        .p-info .nome { font-size: 15px; display: block; text-transform: uppercase; }
+        .p-info .turno-label { font-size: 10px; background: #444; padding: 2px 4px; border-radius: 3px; }
+        .ativo .turno-label { background: #000; color: #fff; }
+        .p-hora { font-size: 14px; font-weight: bold; }
 
-        /* Rodapé de Notícias */
-        footer {
-            background: #000;
-            color: #00ff00;
-            padding: 10px 0;
-            font-size: 20px;
-            white-space: nowrap;
-            overflow: hidden;
-            border-top: 2px solid #333;
-        }
-
-        .news-ticker {
-            display: inline-block;
-            padding-left: 100%;
-            animation: ticker 40s linear infinite;
-        }
-
-        @keyframes ticker {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-100%, 0); }
-        }
+        footer { background: #000; color: #00ff00; height: 35px; display: flex; align-items: center; }
+        .ticker { white-space: nowrap; padding-left: 100%; animation: ticker-anim 60s linear infinite; font-size: 16px; }
+        @keyframes ticker-anim { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-area">
-        <h1>Hosp. Regional Monsenhor Antonio Barros</h1>
-        <p>SESAP - Governo do Rio Grande do Norte</p>
+    <div class="header-titles">
+        <h1>PRONTO SOCORRO OBSTÉTRICO</h1>
+        <p>Hosp. Reg. Mons. Antonio Barros | SESAP-RN</p>
     </div>
-    <div id="clock-container">
-        <div id="clock">00:00:00</div>
-        <div id="date">--/--/----</div>
-    </div>
+    <div id="relogio">00:00:00</div>
 </header>
 
-<main id="dashboard">
-    <div style="grid-column: 1/-1; text-align: center; margin-top: 50px;">
-        <h2>Carregando escala do Google Sheets...</h2>
-    </div>
-</main>
+<main id="painel-grid"></main>
 
 <footer>
-    <div class="ticker-wrap">
-        <div class="ticker" id="ticker-noticias">
-            Carregando notícias do RN...
-        </div>
+    <div style="width:100%; overflow:hidden;">
+        <div class="ticker" id="noticias">Carregando notícias do Rio Grande do Norte...</div>
     </div>
 </footer>
 
 <script>
     const URL_TSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
-    // RSS do G1 Rio Grande do Norte convertido para JSON
     const URL_NOTICIAS = "https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml";
-
-    function atualizarRelogio() {
-        const agora = new Date();
-        document.getElementById('relogio').innerText = agora.toLocaleTimeString('pt-BR');
-        document.getElementById('data-extenso').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-    }
 
     async function buscarNoticias() {
         try {
             const res = await fetch(URL_NOTICIAS);
             const data = await res.json();
-            const manchetes = data.items.map(item => `+++ ${item.title.toUpperCase()}`).join(" ");
-            document.getElementById('ticker-noticias').innerText = manchetes + " +++ FONTE: G1 RN +++";
-        } catch (e) {
-            document.getElementById('ticker-noticias').innerText = "+++ HOSPITAL REGIONAL MONSENHOR ANTONIO BARROS - SESAP RN +++";
-        }
+            document.getElementById('noticias').innerText = data.items.map(i => `+++ ${i.title.toUpperCase()}`).join(" ");
+        } catch (e) { document.getElementById('noticias').innerText = "+++ ESCALA ATUALIZADA - SESAP RN +++"; }
+    }
+
+    function checarAtivo(ini, fim) {
+        if(!ini || !fim) return false;
+        const agora = new Date();
+        const minAt = agora.getHours() * 60 + agora.getMinutes();
+        const [hI, mI] = ini.split(':').map(Number);
+        const [hF, mF] = fim.split(':').map(Number);
+        let minI = hI * 60 + mI, minF = hF * 60 + mF;
+        if (minF < minI) return (minAt >= minI || minAt < minF);
+        return (minAt >= minI && minAt < minF);
     }
 
     async function carregarDados() {
         try {
-            const res = await fetch(URL_TSV);
+            const res = await fetch(URL_TSV + "&cache=" + new Date().getTime());
             const texto = await res.text();
-            const linhas = texto.split('\n').map(l => l.split('\t'));
-            montarPainel(linhas.slice(1)); 
-        } catch (e) {
-            console.error("Erro ao carregar Sheets:", e);
-        }
-    }
+            const linhas = texto.split('\n').slice(1).map(l => l.split('\t'));
+            
+            const grid = document.getElementById('painel-grid');
+            grid.innerHTML = '';
 
-    function checarPlantaoAtivo(inicio, fim) {
-        const agora = new Date();
-        const minAtual = agora.getHours() * 60 + agora.getMinutes();
-        const [hI, mI] = inicio.split(':').map(Number);
-        const [hF, mF] = fim.split(':').map(Number);
-        let minInicio = hI * 60 + mI;
-        let minFim = hF * 60 + mF;
-        if (minFim < minInicio) return (minAtual >= minInicio || minAtual < minFim);
-        return (minAtual >= minInicio && minAtual < minFim);
-    }
+            const categorias = {};
 
-    function montarPainel(dados) {
-        const grid = document.getElementById('painel-grid');
-        grid.innerHTML = '';
-        const categorias = {};
-        dados.forEach(col => {
-            if (col.length < 5) return;
-            const [nome, cargo, especialidade, turno, inicio, fim] = col;
-            if (!categorias[cargo]) categorias[cargo] = [];
-            categorias[cargo].push({nome, especialidade, turno, inicio, fim});
-        });
-
-        for (const cargo in categorias) {
-            const card = document.createElement('div');
-            card.className = 'categoria-card';
-            card.innerHTML = `<h2>${cargo}</h2>`;
-            categorias[cargo].forEach(p => {
-                const ativo = checarPlantaoAtivo(p.inicio, p.fim);
-                const item = document.createElement('div');
-                item.className = `plantonista-item ${ativo ? 'ativo' : ''}`;
-                item.innerHTML = `
-                    <div class="p-info">
-                        <span class="nome">${p.nome}</span>
-                        <span class="esp">${p.especialidade} | ${p.turno}</span>
-                    </div>
-                    <div class="p-hora">${p.inicio} - ${p.fim}</div>
-                `;
-                card.appendChild(item);
+            linhas.forEach(col => {
+                if (col.length < 5) return;
+                let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
+                
+                // Se não houver especialidade, usamos "GERAL" ou vazio para controle
+                const espKey = especialidade || "SEM_ESP";
+                
+                if (!categorias[cargo]) categorias[cargo] = {};
+                if (!categorias[cargo][espKey]) categorias[cargo][espKey] = [];
+                
+                categorias[cargo][espKey].push({nome, turno, inicio, fim});
             });
-            grid.appendChild(card);
-        }
+
+            for (const cargo in categorias) {
+                const card = document.createElement('div');
+                card.className = 'categoria-card';
+                let html = `<h2>${cargo}</h2>`;
+                
+                for (const esp in categorias[cargo]) {
+                    // Só mostra o rótulo da especialidade se ela não for "SEM_ESP"
+                    if (esp !== "SEM_ESP") {
+                        html += `<div class="especialidade-label">${esp}</div>`;
+                    }
+                    
+                    categorias[cargo][esp].forEach(p => {
+                        const ativo = checarAtivo(p.inicio, p.fim);
+                        html += `
+                            <div class="plantonista-item ${ativo ? 'ativo' : ''}">
+                                <div class="p-info">
+                                    <span class="nome">${p.nome}</span>
+                                    <span class="turno-label">${p.turno}</span>
+                                </div>
+                                <div class="p-hora">${p.inicio} - ${p.fim}</div>
+                            </div>`;
+                    });
+                }
+                card.innerHTML = html;
+                grid.appendChild(card);
+            }
+        } catch(e) { console.error(e); }
     }
 
-    // Inicialização
-    setInterval(atualizarRelogio, 1000);
-    setInterval(carregarDados, 30000); // 30 seg para escala
-    setInterval(buscarNoticias, 1800000); // 30 min para notícias
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
+    setInterval(carregarDados, 30000);
+    setInterval(buscarNoticias, 1800000);
     
-    atualizarRelogio();
     carregarDados();
     buscarNoticias();
 </script>
+</body>
+</html>
