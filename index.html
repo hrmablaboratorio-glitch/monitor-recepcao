@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESCALA TV - STRETCH LAYOUT</title>
+    <title>ESCALA TV - PRO LAYOUT</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
             --highlight: #ffff00;
-            --bg: #050505;
+            --bg: #000;
             --card-bg: #111;
             --accent: #00aaff;
+            --border-color: #333;
         }
 
         html, body { 
@@ -29,119 +30,122 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
-            border-bottom: 3px solid #fff;
+            padding: 0 2vw;
+            border-bottom: 4px solid #fff;
             flex-shrink: 0;
+            z-index: 10;
         }
 
-        .h-txt h1 { margin: 0; font-size: 1.8vw; color: white; }
-        #relogio { font-size: 3vw; font-weight: bold; color: white; font-family: monospace; }
+        header h1 { margin: 0; font-size: 2.2vw; color: white; text-transform: uppercase; }
+        #relogio { font-size: 3.5vw; font-weight: bold; color: white; font-family: monospace; }
 
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 2px;
-            gap: 4px;
+            padding: 0; /* Removido para os quadros encostarem na borda da tela */
+            gap: 2px;
             min-height: 0;
         }
 
         .categoria-linha {
             flex: 1; 
-            background: var(--card-bg);
-            border: 1px solid #333;
             display: flex;
-            align-items: stretch; /* Garante que o conteúdo estique verticalmente */
+            align-items: stretch;
             min-height: 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .cargo-titulo {
             background: var(--accent);
             color: #000;
-            width: 12vw;
+            width: 14vw; /* Aumentado um pouco para caber "TÉCNICO DE ENFERMAGEM" sem apertar */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3vw;
+            font-size: 1.2vw;
             text-align: center;
-            padding: 5px;
+            padding: 10px;
             flex-shrink: 0;
             font-weight: 900;
             text-transform: uppercase;
             line-height: 1.1;
+            border-right: 2px solid #fff;
         }
 
         .profissionais-container {
             flex: 1;
-            display: grid;
-            /* auto-fit faz os itens crescerem para ocupar todo o espaço horizontal */
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 4px;
-            padding: 0; /* Removido padding para encostar nas bordas */
+            display: flex; /* Mudado de grid para flex para preenchimento total */
+            flex-direction: row;
             align-items: stretch;
+            background: #000;
         }
 
         .plantonista-box {
-            background: #222;
-            padding: 5px;
+            flex: 1; /* A MÁGICA: Faz cada box dividir o espaço horizontal igualmente */
+            background: #1a1a1a;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Centraliza o texto verticalmente no espaço ganho */
+            justify-content: center;
             align-items: center;
             text-align: center;
-            border: 1px solid #333;
-            height: 100%; /* Ocupa o topo e o fundo da faixa */
+            border-right: 1px solid var(--border-color);
+            padding: 0 10px;
+            transition: all 0.3s;
         }
+
+        .plantonista-box:last-child { border-right: none; }
 
         .plantonista-box.ativo {
             background: var(--highlight) !important;
             color: #000 !important;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
         }
 
         .nome { 
-            font-size: 1.6vw; 
+            font-size: 2vw; /* Fonte maior para TV */
             font-weight: 900; 
             text-transform: uppercase;
             line-height: 1;
-            margin-bottom: 4px;
+            margin-bottom: 0.5vh;
         }
 
         .info-sub { 
-            font-size: 1.1vw; 
+            font-size: 1.2vw; 
             font-weight: bold; 
-            opacity: 0.9;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
+
+        .ativo .info-sub { background: rgba(0,0,0,0.2); }
 
         footer {
             background: #000;
-            height: 5vh;
+            height: 6vh;
             display: flex;
             align-items: center;
-            border-top: 2px solid #333;
+            border-top: 3px solid #222;
             flex-shrink: 0;
         }
 
         .ticker {
             white-space: nowrap;
-            animation: ticker 40s linear infinite;
-            font-size: 1.5vw;
+            animation: ticker 45s linear infinite;
+            font-size: 1.8vw;
             color: #00ff00;
             font-weight: bold;
         }
 
         @keyframes ticker {
             0% { transform: translateX(100%); }
-            100% { transform: translateX(-200%); }
+            100% { transform: translateX(-250%); }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="h-txt">
-        <h1>PS OBSTÉTRICO - MONS. ANTONIO BARROS</h1>
-    </div>
+    <h1 id="hospital-nome">PS OBSTÉTRICO - MONS. ANTONIO BARROS</h1>
     <div id="relogio">00:00:00</div>
 </header>
 
@@ -149,7 +153,7 @@
 
 <footer>
     <div style="width:100%; overflow:hidden;">
-        <div class="ticker" id="noticias">ATUALIZANDO ESCALA VIA DISPOSITIVO MÓVEL...</div>
+        <div class="ticker" id="noticias">ATUALIZANDO ESCALA... SESAP-RN 2025 ...</div>
     </div>
 </footer>
 
@@ -176,6 +180,7 @@
             const container = document.getElementById('painel-horizontal');
             const categorias = {};
 
+            // Mapeamento de nomes de colunas conforme o seu TSV
             linhas.forEach(col => {
                 if (col.length < 5) return;
                 let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
@@ -205,10 +210,14 @@
                 linhaDiv.innerHTML = html;
                 container.appendChild(linhaDiv);
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Erro ao carregar dados:", e); }
     }
 
-    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
+    setInterval(() => { 
+        const d = new Date();
+        document.getElementById('relogio').innerText = d.toLocaleTimeString('pt-BR'); 
+    }, 1000);
+    
     setInterval(carregarDados, 30000);
     carregarDados();
 </script>
