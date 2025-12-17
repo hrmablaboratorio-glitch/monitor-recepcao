@@ -190,4 +190,43 @@
 
             linhas.forEach(col => {
                 if (col.length < 5) return;
-                let [nome, cargo, especialidade, turno, inicio, fim] =
+                let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
+                const espKey = especialidade || "GERAL";
+                if (!categorias[cargo]) categorias[cargo] = {};
+                if (!categorias[cargo][espKey]) categorias[cargo][espKey] = [];
+                categorias[cargo][espKey].push({nome, turno, inicio, fim});
+            });
+
+            for (const cargo in categorias) {
+                const coluna = document.createElement('div');
+                coluna.className = 'categoria-coluna';
+                
+                let html = `<h2>${cargo}</h2><div class="lista-plantonistas">`;
+                
+                for (const esp in categorias[cargo]) {
+                    if (esp !== "GERAL") html += `<div class="especialidade-label">${esp}</div>`;
+                    categorias[cargo][esp].forEach(p => {
+                        const ativo = checarAtivo(p.inicio, p.fim);
+                        html += `
+                            <div class="plantonista-item ${ativo ? 'ativo' : ''}">
+                                <div class="p-info">
+                                    <span class="nome">${p.nome}</span>
+                                </div>
+                                <div class="hora">${p.inicio} - ${p.fim}</div>
+                            </div>`;
+                    });
+                }
+                html += `</div>`;
+                coluna.innerHTML = html;
+                container.appendChild(coluna);
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
+    setInterval(carregarDados, 30000);
+    setInterval(buscarNoticias, 1800000);
+    carregarDados(); buscarNoticias();
+</script>
+</body>
+</html>
