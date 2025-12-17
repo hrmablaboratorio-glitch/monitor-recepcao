@@ -24,7 +24,6 @@
 
         body { display: flex; flex-direction: column; }
 
-        /* HEADER AJUSTADO - SEM LOGO, ESPAÇO TOTAL PARA TEXTO */
         header {
             background: var(--sesap-blue);
             height: 14vh;
@@ -60,14 +59,13 @@
         }
 
         #relogio {
-            font-size: 5.0vw; /* Relógio bem grande para TV */
+            font-size: 5.0vw;
             font-weight: bold;
             color: #FFFFFF;
             font-family: monospace;
             line-height: 1;
         }
 
-        /* CORPO DA ESCALA */
         main {
             flex: 1;
             display: flex;
@@ -104,6 +102,9 @@
             flex: 1;
             display: flex;
             flex-direction: row;
+            /* Permite que os boxes se ajustem melhor */
+            flex-wrap: nowrap; 
+            overflow: hidden;
         }
 
         .plantonista-box {
@@ -115,7 +116,8 @@
             align-items: center;
             text-align: center;
             border-right: 1px solid var(--border);
-            padding: 10px;
+            padding: 5px;
+            min-width: 0; /* Evita que o box estoure o container */
         }
 
         .plantonista-box.ativo {
@@ -123,10 +125,17 @@
             color: #000 !important;
         }
 
-        .nome { font-size: 2.2vw; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
-        .info-sub { font-size: 1.3vw; font-weight: bold; margin-top: 5px; }
+        /* Ajuste de fonte responsivo para nomes longos */
+        .nome { 
+            font-size: 2vw; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            line-height: 1;
+            word-wrap: break-word;
+        }
+        
+        .info-sub { font-size: 1.2vw; font-weight: bold; margin-top: 5px; }
 
-        /* RODAPÉ DE NOTÍCIAS */
         footer {
             background: #000;
             height: 8vh;
@@ -175,7 +184,6 @@
 <script>
     const URL_TSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
     
-    // Função unificada para tempo e data
     function atualizarTempo() {
         const agora = new Date();
         const opcoesData = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -232,11 +240,18 @@
             for (const chave in categorias) {
                 const linhaDiv = document.createElement('div');
                 linhaDiv.className = 'categoria-linha';
+                
+                // Ordena: quem está ativo aparece primeiro à esquerda
                 categorias[chave].sort((a, b) => b.ativo - a.ativo);
+                
+                // Reduz fonte se houver muitos profissionais (ex: Técnicos)
+                let totalProf = categorias[chave].length;
+                let fontSizeNome = totalProf > 3 ? '1.8vw' : '2.2vw';
+
                 let html = `<div class="cargo-titulo">${chave}</div><div class="profissionais-container">`;
                 categorias[chave].forEach(p => {
                     html += `<div class="plantonista-box ${p.ativo ? 'ativo' : ''}">
-                        <div class="nome">${p.nome}</div>
+                        <div class="nome" style="font-size: ${fontSizeNome}">${p.nome}</div>
                         <div class="info-sub">${p.inicio} - ${p.fim}</div>
                     </div>`;
                 });
@@ -254,5 +269,3 @@
 </script>
 </body>
 </html>
-
-
