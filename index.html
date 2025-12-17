@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESCALA PRO - SESAP RN</title>
+    <title>ESCALA PRO FINAL - SESAP RN</title>
     <style>
         :root {
             --sesap-blue: #004a8d;
             --highlight: #ffff00;
             --bg: #000;
             --accent: #00aaff;
-            --border: #333;
+            --border: #444;
         }
 
         html, body { 
@@ -59,9 +59,10 @@
             color: #000;
             width: 14vw;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 1.2vw;
+            font-size: 1.1vw;
             text-align: center;
             padding: 5px;
             flex-shrink: 0;
@@ -78,7 +79,7 @@
         }
 
         .plantonista-box {
-            flex: 1; /* Distribui todos os profissionais da linha igualmente */
+            flex: 1;
             background: #151515;
             display: flex;
             flex-direction: column;
@@ -86,7 +87,7 @@
             align-items: center;
             text-align: center;
             border-right: 1px solid var(--border);
-            padding: 5px;
+            padding: 10px;
         }
 
         .plantonista-box.ativo {
@@ -94,43 +95,34 @@
             color: #000 !important;
         }
 
-        .nome { 
-            font-size: 1.8vw; 
-            font-weight: 900; 
-            text-transform: uppercase;
-            line-height: 1.1;
-        }
-
-        .info-sub { 
-            font-size: 1.1vw; 
-            font-weight: bold;
-            margin-top: 4px;
-        }
+        .nome { font-size: 1.8vw; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
+        .info-sub { font-size: 1vw; font-weight: bold; margin-top: 5px; opacity: 0.9; }
 
         footer {
             background: #000;
             height: 7vh;
             display: flex;
             align-items: center;
-            border-top: 3px solid var(--sesap-blue);
+            border-top: 4px solid #00ff00;
             flex-shrink: 0;
             overflow: hidden;
         }
 
-        .ticker-wrap { width: 100%; overflow: hidden; }
+        /* Animação do Letreiro */
+        .ticker-wrap { width: 100%; white-space: nowrap; }
         .ticker {
             display: inline-block;
-            white-space: nowrap;
             padding-left: 100%;
-            animation: ticker 150s linear infinite; /* Tempo aumentado para mais notícias */
-            font-size: 1.8vw;
+            animation: ticker-move 120s linear infinite;
+            font-size: 2vw;
             color: #00ff00;
             font-weight: bold;
+            text-transform: uppercase;
         }
 
-        @keyframes ticker {
+        @keyframes ticker-move {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-500%); }
+            100% { transform: translateX(-100%); }
         }
     </style>
 </head>
@@ -145,24 +137,35 @@
 
 <footer>
     <div class="ticker-wrap">
-        <div class="ticker" id="noticias">CARREGANDO ÚLTIMAS NOTÍCIAS DO G1 RIO GRANDE DO NORTE...</div>
+        <div class="ticker" id="noticias">BUSCANDO NOTÍCIAS G1 RN... AGUARDE...</div>
     </div>
 </footer>
 
 <script>
     const URL_TSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQQcMYSj39HleddDw8NueoGbvjni4DoOOfPNpt2RBqgt85U894xL40QXO_eEVSO-5GVxq6Vc3joIDzq/pub?output=tsv";
-    // RSS do G1 RN convertido para JSON (puxa as 20 mais recentes)
-    const URL_G1 = "https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml&api_key=your_api_key_here&count=20";
+    
+    // Usando AllOrigins para burlar o CORS e carregar as notícias
+    const URL_G1_PROXY = "https://api.allorigins.win/get?url=" + encodeURIComponent("https://g1.globo.com/dynamo/rn/rio-grande-do-norte/rss2.xml");
 
     async function buscarNoticias() {
         try {
-            const res = await fetch(URL_G1);
-            const data = await res.json();
-            if(data.status === 'ok') {
-                const manchetes = data.items.map(i => `+++ ${i.title.toUpperCase()}`).join("    ");
-                document.getElementById('noticias').innerText = manchetes + " +++ FONTE: G1 RN";
-            }
-        } catch (e) { document.getElementById('noticias').innerText = "ESCALA ATUALIZADA - SESAP RN"; }
+            const res = await fetch(URL_G1_PROXY);
+            const json = await res.json();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(json.contents, "text/xml");
+            const items = xml.querySelectorAll("item");
+            
+            let textoNoticias = "";
+            items.forEach((item, index) => {
+                if(index < 20) { // Pega as 20 primeiras
+                    const titulo = item.querySelector("title").textContent;
+                    textoNoticias += ` +++ ${titulo.toUpperCase()}`;
+                }
+            });
+            document.getElementById('noticias').innerText = textoNoticias + " +++ FONTE: G1 RN";
+        } catch (e) { 
+            document.getElementById('noticias').innerText = "ESCALA ATUALIZADA - SESAP RN - MONSENHOR ANTONIO BARROS"; 
+        }
     }
 
     function checarAtivo(ini, fim) {
@@ -188,25 +191,29 @@
             linhas.forEach(col => {
                 if (col.length < 5) return;
                 let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
-                if (!categorias[cargo]) categorias[cargo] = [];
-                categorias[cargo].push({nome, especialidade, turno, inicio, fim});
+                
+                // AJUSTE PARA MÉDICOS: Cria uma categoria única por especialidade para não misturar
+                let chave = cargo;
+                if(cargo === "MÉDICO") chave = `MÉDICO (${especialidade})`;
+
+                if (!categorias[chave]) categorias[chave] = [];
+                categorias[chave].push({nome, especialidade, turno, inicio, fim});
             });
 
             container.innerHTML = '';
-            for (const cargo in categorias) {
+            for (const chave in categorias) {
                 const linhaDiv = document.createElement('div');
                 linhaDiv.className = 'categoria-linha';
                 
-                let html = `<div class="cargo-titulo">${cargo}</div>`;
+                let html = `<div class="cargo-titulo">${chave}</div>`;
                 html += `<div class="profissionais-container">`;
                 
-                categorias[cargo].forEach(p => {
+                categorias[chave].forEach(p => {
                     const ativo = checarAtivo(p.inicio, p.fim);
-                    const labelEsp = p.especialidade && p.especialidade !== "GERAL" ? ` | ${p.especialidade}` : '';
                     html += `
                         <div class="plantonista-box ${ativo ? 'ativo' : ''}">
                             <div class="nome">${p.nome}</div>
-                            <div class="info-sub">${p.inicio} - ${p.fim}${labelEsp}</div>
+                            <div class="info-sub">${p.inicio} - ${p.fim}</div>
                         </div>`;
                 });
                 
@@ -217,15 +224,11 @@
         } catch(e) { console.error(e); }
     }
 
-    setInterval(() => { 
-        document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); 
-    }, 1000);
-    
+    setInterval(() => { document.getElementById('relogio').innerText = new Date().toLocaleTimeString('pt-BR'); }, 1000);
     setInterval(carregarDados, 30000);
-    setInterval(buscarNoticias, 600000); // Atualiza notícias a cada 10 min
+    setInterval(buscarNoticias, 900000); // 15 min
     
-    carregarDados(); 
-    buscarNoticias();
+    carregarDados(); buscarNoticias();
 </script>
 </body>
 </html>
