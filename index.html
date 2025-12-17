@@ -35,10 +35,10 @@
             flex-shrink: 0;
         }
 
-        .header-left {
+       .header-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 30px; /* Aumentei de 20 para 30 para afastar o texto da logo */
         }
 
         .logo-box {
@@ -54,7 +54,8 @@
         .logo-img {
             height: 7vh;
             width: auto;
-            display: block;
+            object-fit: contain; /* Garante que a imagem não distorça */
+        }
         }
 
         header h1 { 
@@ -165,14 +166,14 @@
 
 <header>
     <div class="header-left">
-        <div class="logo-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Logotipo_do_Governo_do_Rio_Grande_do_Norte.svg/1024px-Logotipo_do_Governo_do_Rio_Grande_do_Norte.svg.png" 
-                 alt="Governo RN" class="logo-img">
-            <div style="width: 2px; height: 5vh; background: #ddd;"></div>
-            <img src="https://www.saude.rn.gov.br/wp-content/uploads/2021/04/cropped-logo-sesap-1.png" 
-                 alt="SESAP" class="logo-img">
-        </div>
-        <h1>PS OBSTÉTRICO<br>MONS. ANTONIO BARROS</h1>
+       <div class="logo-box">
+    <img src="logo_rn.png" alt="Governo RN" class="logo-img">
+    
+    <div style="width: 2px; height: 5vh; background: #ddd;"></div>
+    
+    <img src="logo_sesap.png" alt="SESAP" class="logo-img">
+</div>
+        <h1>PRONTO-SOCORRO OBSTÉTRICO<br>HOSPITAL REGIONAL MONS. ANTONIO BARROS</h1>
     </div>
     <div id="relogio">00:00:00</div>
 </header>
@@ -273,3 +274,4 @@
 </script>
 </body>
 </html>
+
