@@ -206,7 +206,7 @@
         try {
             const res = await fetch(URL_TSV + "&nocache=" + Date.now());
             const texto = await res.text();
-            const linhas = texto.split('\n').slice(1).map(l => l.split('\t'));
+            const linhas = texto.split('\n').slice(1).map(l => l.split(','));
             const container = document.getElementById('painel-horizontal');
             const categorias = {};
 
@@ -258,6 +258,7 @@
 </script>
 </body>
 </html>
+
 
 
 
