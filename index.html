@@ -213,7 +213,8 @@
             linhas.forEach(col => {
                 if (col.length < 5) return;
                 let [nome, cargo, especialidade, turno, inicio, fim] = col.map(s => s.trim());
-                let chave = cargo === "MÉDICO" ? `MÉDICO (${especialidade})` : cargo;
+                // Esta linha aceita tanto MÉDICO quanto MÉDICA para exibir a especialidade
+                let chave = (cargo === "MÉDICO" || cargo === "MÉDICA") ? `${cargo} (${especialidade})` : cargo;
                 if (!categorias[chave]) categorias[chave] = [];
                 categorias[chave].push({ nome, inicio, fim, ativo: checarAtivo(inicio, fim) });
             });
@@ -258,6 +259,7 @@
 </script>
 </body>
 </html>
+
 
 
 
